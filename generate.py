@@ -29,7 +29,7 @@ def artwork_create(style, subject, colors, tone):
 
   out = openai.Image.create(
     prompt= painting_idea_elements[index],
-    n=2,
+    n=1,
     size="1024x1024"
   )
 
