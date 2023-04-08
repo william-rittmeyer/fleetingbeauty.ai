@@ -3,7 +3,7 @@ import requests
 import json
 
 from requests.structures import CaseInsensitiveDict
-openai.api_key = "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"
+openai.api_key = "USER_KEY"
 
 def artwork_create(style, subject):
 
