@@ -6,15 +6,14 @@ import random
 from requests.structures import CaseInsensitiveDict
 openai.api_key = "USER-KEY"
 
-
-
-
-def artwork_create(style, subject):
+def artwork_create(style, subject, colors, tone):
 
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo", 
     messages=[{"role": "user", "content": 
-              "generate 10 extremely detailed ideas (with a title) of" + style + "paintings involving" + subject
+              "generate 8 extremely detailed ideas (with a title) of" + style + 
+               "paintings involving" + subject + "with a color scheme of" + 
+               colors + " and tone of" + tone
 
   }]
   )
@@ -26,7 +25,7 @@ def artwork_create(style, subject):
   del painting_idea_elements[1::2]
   #print(painting_elements_unsorted)
 
-  index = random.randint(0,9)
+  index = random.randint(0,6)
 
   out = openai.Image.create(
     prompt= painting_idea_elements[index],
