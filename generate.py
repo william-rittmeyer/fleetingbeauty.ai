@@ -4,7 +4,7 @@ import json
 import random
 
 from requests.structures import CaseInsensitiveDict
-openai.api_key = "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"
+openai.api_key = "USER-KEY"
 
 
 
