@@ -11,9 +11,9 @@ def artwork_create(style, subject, colors, tone):
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo", 
     messages=[{"role": "user", "content": 
-              "generate 8 extremely detailed ideas (with a title) of" + style + 
+              "generate 10 extremely detailed ideas of 3 sentences each (with a title for each idea in quotation marks) of" + style + 
                "paintings involving" + subject + "with a color scheme of" + 
-               colors + " and tone of" + tone
+               colors + " and tone of" + tone + ". Do not add any text other than the title and description."
 
   }]
   )
@@ -23,12 +23,13 @@ def artwork_create(style, subject, colors, tone):
   painting_idea_elements = painting_ideas.split('\n')
 
   del painting_idea_elements[1::2]
-  #print(painting_elements_unsorted)
 
-  index = random.randint(0,6)
+  print(painting_idea_elements)
+
+  index = random.randint(0,4)
 
   out = openai.Image.create(
-    prompt= painting_idea_elements[index],
+    prompt= painting_idea_elements[index] + "make sure the painting covers the whole image (this is necessary)",
     n=1,
     size="1024x1024"
   )
@@ -45,9 +46,3 @@ def artwork_create(style, subject, colors, tone):
       selected_image_urls.append(item['url'])
 
   return [selected_image_urls[0], image_title]
-
-  #    print(item['url'])
-
-  #image_url has the links to images generated (only 2)
-
-  #need to have user input and user output
