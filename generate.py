@@ -15,12 +15,11 @@ def artwork_create(style, subject, colors, tone):
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo", 
     messages=[{"role": "user", "content": 
-              "generate 10 extremely detailed ideas of 3 sentences each (with a title for each idea and the title must be in quotation marks) of" + style + 
-               "paintings involving" + subject + "with a color scheme of" + 
-               colors + " and tone of" + tone + ". Do not add any text other than the title and description."
+              "generate 10 extremely detailed surreal painting ideas (3 sentences each, with a title for each idea, and the title must be in quotation marks). Do not add any text other than the title and description."
 
   }]
   )
+
 
 
   painting_ideas =  output['choices'][0]['message']['content']
@@ -65,7 +64,7 @@ while True:
     A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
 
 
-    webbrowser.open_new(A)
+    webbrowser.open_new(A[0])
   
 
   # wait for one minute
