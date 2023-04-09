@@ -2,16 +2,20 @@ import openai
 import requests
 import json
 import random
+import time
+import datetime
+import webbrowser
 
 from requests.structures import CaseInsensitiveDict
-openai.api_key = "USER-KEY"
+openai.api_key = "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"
+
 
 def artwork_create(style, subject, colors, tone):
 
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo", 
     messages=[{"role": "user", "content": 
-              "generate 10 extremely detailed ideas of 3 sentences each (with a title for each idea in quotation marks) of" + style + 
+              "generate 10 extremely detailed ideas of 3 sentences each (with a title for each idea and the title must be in quotation marks) of" + style + 
                "paintings involving" + subject + "with a color scheme of" + 
                colors + " and tone of" + tone + ". Do not add any text other than the title and description."
 
@@ -43,6 +47,26 @@ def artwork_create(style, subject, colors, tone):
 
   for item in json_data['data']:
 
-      selected_image_urls.append(item['url'])
+    selected_image_urls.append(item['url'])
+
+  print(image_title)
+  print(selected_image_urls[0])
+
 
   return [selected_image_urls[0], image_title]
+
+while True:
+  # get the current time
+  now = datetime.datetime.now()
+
+  # check if it's the top of the hour
+  if now.second == 0:
+  # run the function
+    A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
+
+
+    webbrowser.open_new(A)
+  
+
+  # wait for one minute
+  time.sleep(1)
