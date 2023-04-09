@@ -61,11 +61,11 @@ while True:
   # check if it's the top of the hour
   if now.second == 0:
   # run the function
-    A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
+  #  A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
 
 
-    webbrowser.open_new(A[0])
+    webbrowser.open(A[0], new=0)
   
 
   # wait for one minute
-  time.sleep(1)
+  time.sleep(60)
