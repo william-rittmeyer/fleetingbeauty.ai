@@ -7,7 +7,7 @@ import datetime
 import webbrowser
 
 from requests.structures import CaseInsensitiveDict
-openai.api_key = "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"
+openai.api_key = "APIKEY"
 
 
 def artwork_create(style, subject, colors, tone):
