@@ -67,7 +67,7 @@ while True:
   now = datetime.datetime.now()
 
   # check if it's the top of the hour
-  if now.second == 0:
+  if now.minute == 0:
   # run the function
     try:
       A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
@@ -87,4 +87,4 @@ while True:
   
 
   # wait for one minute
-  time.sleep(1)
+  time.sleep(60)
