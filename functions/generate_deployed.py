@@ -78,13 +78,9 @@ while True:
       ref.update({'painting_name': A[1]})
 
       print('picture updated')
+      break
       
 
       
     except ValueError:
       print("error, trying again")
-
-  
-
-  # wait for one minute
-  time.sleep(1)

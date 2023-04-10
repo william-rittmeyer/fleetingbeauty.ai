@@ -8,7 +8,7 @@ firebase_admin.initialize_app(cred, {'databaseURL': 'https://fleeting-beauty-def
 ref = db.reference('')
 
 
-ref.set({'url': 'value1', 'time': 'value2'})
+ref.set({'painting_name': 'value1', 'url': 'value2'})
 
 
 print('data has been added')
