@@ -55,20 +55,20 @@ def artwork_create(style, subject, colors, tone):
   return [selected_image_urls[0], image_title]
 
 while True:
-  try:
-    # get the current time
-    now = datetime.datetime.now()
 
-    # check if it's the top of the hour
-    if now.second == 0:
-    # run the function
+  # get the current time
+  now = datetime.datetime.now()
+
+  # check if it's the top of the hour
+  if now.second == 0:
+  # run the function
+    try:
       A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
-
-
       webbrowser.open(A[0], new=0)
+
       break
-   except ValueError:
+    except ValueError:
       print("error, trying again")
 
   # wait for one minute
-  time.sleep(60)
+  time.sleep(1)
