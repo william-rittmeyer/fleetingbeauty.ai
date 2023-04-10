@@ -5,6 +5,13 @@ import random
 import time
 import datetime
 import webbrowser
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+
+cred = credentials.Certificate('serviceAccountKey.json')
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://fleeting-beauty-default-rtdb.firebaseio.com/'})
 
 from requests.structures import CaseInsensitiveDict
 openai.api_key = "APIKEY"
@@ -15,7 +22,7 @@ def artwork_create(style, subject, colors, tone):
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo", 
     messages=[{"role": "user", "content": 
-              "generate 11 extremely detailed surreal painting ideas (3 sentences each, with a title for each idea, and the title must be in quotation marks). Do not add any text other than the title and description. Start each description with 'A painting' "
+              "generate 11 extremely detailed abstract painting ideas (3 sentences each, with a title for each idea, and the title must be in quotation marks). Do not add any text other than the title and description. Start each description with 'A painting' "
 
   }]
   )
@@ -48,8 +55,8 @@ def artwork_create(style, subject, colors, tone):
 
     selected_image_urls.append(item['url'])
 
-  print(image_title)
-  print(selected_image_urls[0])
+#  print(image_title)
+#  print(selected_image_urls[0])
 
 
   return [selected_image_urls[0], image_title]
@@ -64,10 +71,17 @@ while True:
   # run the function
     try:
       A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
-      webbrowser.open(A[0], new=0)
+#      webbrowser.open(A[0], new=0)
 
+      ref = db.reference('')
+      ref.update({'url': A[0]})
+      
+
+      
     except ValueError:
       print("error, trying again")
+
+  
 
   # wait for one minute
   time.sleep(1)
