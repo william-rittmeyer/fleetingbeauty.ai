@@ -66,7 +66,6 @@ while True:
       A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
       webbrowser.open(A[0], new=0)
 
-      break
     except ValueError:
       print("error, trying again")
 
