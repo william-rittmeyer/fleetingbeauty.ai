@@ -15,7 +15,7 @@ def artwork_create(style, subject, colors, tone):
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo", 
     messages=[{"role": "user", "content": 
-              "generate 10 extremely detailed surreal painting ideas (3 sentences each, with a title for each idea, and the title must be in quotation marks). Do not add any text other than the title and description."
+              "generate 11 extremely detailed surreal painting ideas (3 sentences each, with a title for each idea, and the title must be in quotation marks). Do not add any text other than the title and description. Start each description with 'A painting' "
 
   }]
   )
