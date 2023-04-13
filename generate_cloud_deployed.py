@@ -17,40 +17,33 @@ from requests.structures import CaseInsensitiveDict
 openai.api_key = "APIKEY"
 
 
+def remove_short_strings(lst):
+    return list(filter(lambda x: len(x)>=20, lst))
+
+
 def artwork_create(style, subject, colors, tone):
 
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
               'generate 11 detailed, professional landscape painting ideas that are 3 sentences each, with a title for each idea. The title must be in quotation marks like this "painting idea". Do not add any text other than the title and description. Start each description with the words, A painting'
-
   }]
   )
 
-
-
   painting_ideas =  output['choices'][0]['message']['content']
   painting_idea_elements = painting_ideas.split('\n')
-
-  #print(painting_idea_elements)
 
   number_1= len(painting_idea_elements)
   first_element = painting_idea_elements[0]
   second_element = painting_idea_elements[1]
 
-  del painting_idea_elements[1::2]
-  del painting_idea_elements[:1]
-  #print('------------------------')
-
-  #print(painting_idea_elements)
-
-
+  painting_idea_elements = remove_short_strings(painting_idea_elements)
 
 
   print("-----------------------------------------------")
-  print("elements to choose from:")
+  print("elements to choose from: (ERROR IF IT IS NOT 11)")
   print(len(painting_idea_elements))
-  index = random.randint(0,4)
+  index = random.randint(0,len(painting_idea_elements)-1)
 
   out = openai.Image.create(
     prompt= painting_idea_elements[index] + "The painting must fill the whole screen",
@@ -68,10 +61,6 @@ def artwork_create(style, subject, colors, tone):
   for item in json_data['data']:
 
     selected_image_urls.append(item['url'])
-
-#  print(image_title)
-#  print(selected_image_urls[0])
-
 
   return [selected_image_urls[0], image_title, number_1, first_element, second_element ]
 
@@ -100,8 +89,6 @@ while True:
       print(A[4])
       print("-----------------------------------------------")
       break
-
-
 
     except ValueError:
       print("error, trying again")
