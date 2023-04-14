@@ -2,13 +2,17 @@ import openai
 import json
 import random
 import datetime
+import requests
 import firebase_admin
 from firebase_admin import credentials
+from firebase_admin import storage
 from firebase_admin import db
 
 cred = credentials.Certificate('serviceAccountKey.json')
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://fleeting-beauty-default-rtdb.firebaseio.com/'})
+    'databaseURL': 'https://fleeting-beauty-default-rtdb.firebaseio.com/',
+    'storageBucket': 'fleeting-beauty.appspot.com'
+})
 
 openai.api_key = "APIKEY"
 
@@ -21,7 +25,7 @@ def artwork_create(style, subject, colors, tone):
   output = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate 11 detailed, professional landscape painting ideas that are 3 sentences each, with a title for each idea. The title MUST BE IN DOUBLE QUOTATION MARKS like this "painting idea". Do not add any text other than the title and description. Start each description with the words, A professional painting'
+              'generate 11 detailed, professional landscape painting ideas that are 3 sentences each, with a title for each idea. The title MUST BE IN DOUBLE QUOTATION MARKS like this "painting idea". Do not add any text other than the title and description. Start each description with the words, An impressionist painting'
   }]
   )
 
@@ -74,7 +78,6 @@ while True:
   # run the function
     try:
       A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
-#      webbrowser.open(A[0], new=0)
 
       ref = db.reference('')
       ref2 = db.reference('version_1/landscape')
@@ -84,10 +87,33 @@ while True:
       ref2.update({'url': A[0]})
       ref2.update({'painting_name': A[1]})
 
+      # Define the URL of the image you want to download and upload
+
+      image_url = A[0]
+
+
+      current_datetime = datetime.datetime.now()
+      datetime_string = current_datetime.strftime("%m_%d_%Y_%H:%M:%S_")
+
+      filename = datetime_string + A[1].lower().replace(" ","_")
+      folder_path = "prototype/"
+
+      # Download the image from the URL
+      response = requests.get(image_url)
+      if response.status_code == 200:
+        # Upload the image to Firebase storage
+        bucket = storage.bucket()
+        blob = bucket.blob(folder_path + filename)
+        blob.upload_from_string(response.content, content_type=response.headers.get("content-type"))
+
+        # Print the URL of the uploaded image
+        print(f"Uploaded {filename} to {blob.public_url}")
+      else:
+        print(f"Failed to download image from {image_url}")
+
+
       print('picture updated')
       break
-
-
 
     except ValueError:
       print("error, trying again")
