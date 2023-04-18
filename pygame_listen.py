@@ -41,13 +41,11 @@ def load_image_from_url(location):
 def display_image(image):
     global previous_image
     screen_width, screen_height = pygame.display.get_surface().get_size()
-    image = pygame.transform.scale(image, (screen_width, screen_height))
+    image = pygame.transform.scale(image, (screen_width, screen_height)) # resize the image to the screen size
 
-    x = 0
-    y = 0
     alpha = 0
     max_alpha = 255
-    fade_speed = 5
+    fade_speed = 10
 
     while alpha < max_alpha:
         alpha += fade_speed
@@ -55,13 +53,13 @@ def display_image(image):
             alpha = max_alpha
 
         if previous_image is not None:
-            pygame.display.get_surface().blit(previous_image, (x, y))  # Blit the previous image
+            pygame.display.get_surface().blit(previous_image, (0, 0))  # Blit the previous image
         image.set_alpha(alpha)
-        pygame.display.get_surface().blit(image, (x, y))
+        pygame.display.get_surface().blit(image, (0, 0))
         pygame.display.flip()
-        pygame.time.delay(50)
 
     previous_image = image.copy()
+
 
 def display_image_from_url(location):
     global previous_image, next_image
@@ -80,10 +78,11 @@ def display_error():
 
 
 pygame.init()
-pygame.display.set_mode((1024,1024))
+screen = pygame.display.set_mode((1920, 1080))  # Initialize a display surface
+pygame.display.set_caption("Hello World")  # Optional caption for the window
+info = pygame.display.Info()
+screen = pygame.display.set_mode((info.current_w, info.current_h)) # Set the display mode to match the screen resolution
 pygame.mouse.set_visible(False)
-info = pygame.display.Info() # Get the display info
-screen = pygame.display.set_mode((1024, 1024))
 
 location = requests.get(url_endpoint).json()
 display_image_from_url(location)
@@ -103,5 +102,4 @@ while True:
         display_image_from_url(new_location)
 
     time.sleep(0.1)
-    print(new_location)
-    print('success!')
+
