@@ -5,6 +5,7 @@ import pygame
 import requests
 from io import BytesIO
 from threading import Thread
+from PIL import Image
 
 database_url = 'https://fleeting-beauty-default-rtdb.firebaseio.com/'
 url_endpoint = database_url + 'url.json'
@@ -32,7 +33,8 @@ def load_image_from_url(location):
 
     try:
         image_file = BytesIO(image_data)
-        image = pygame.image.load(image_file)
+        image = Image.open(image_file)
+        image = pygame.image.fromstring(image.tobytes(), image.size, image.mode)
         print('load_image_from_url: image loaded from', location)
     except pygame.error as e:
         return None
