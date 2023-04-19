@@ -78,11 +78,32 @@ def display_error():
 
 
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))  # Initialize a display surface
+
+# Set the possible display resolutions in a dictionary
+resolutions = {
+    '8K': (7680, 4320),
+    '4K': (3840, 2160),
+    '1440p': (2560, 1440),
+    '1080p': (1920, 1080),
+    '720p': (1280, 720)
+}
+
+# Try setting the display to the highest available resolution first
+for res in sorted(resolutions.values(), reverse=True):
+    try:
+        screen = pygame.display.set_mode(res)
+        print(f"Display resolution set to {res[0]}x{res[1]}")
+        break
+    except pygame.error:
+        continue
+
+# If none of the available resolutions work, set the resolution to (100, 100)
+else:
+    screen = pygame.display.set_mode((100, 100))
+    print("Display resolution set to 100x100")
+
 pygame.display.set_caption("Hello World")  # Optional caption for the window
 info = pygame.display.Info()
-screen = pygame.display.set_mode((info.current_w, info.current_h)) # Set the display mode to match the screen resolution
-print("Display resolution is:", info.current_w, "x", info.current_h)
 pygame.mouse.set_visible(False)
 
 location = requests.get(url_endpoint).json()
