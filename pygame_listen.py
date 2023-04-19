@@ -57,10 +57,8 @@ def load_image_from_url(location, resolution):
 
     # Scale the image down to fit the screen size with anti-aliasing
     screen_width, screen_height = pygame.display.get_surface().get_size()
-    if resolution == (1280, 720):
-        image = pygame.transform.smoothscale(image, (int(screen_width/2), int(screen_height/2)))
-    else:
-        image = pygame.transform.smoothscale(image, (screen_width, screen_height))
+
+    image = pygame.transform.smoothscale(image, (screen_width, screen_height))
 
     return image.convert()
 
