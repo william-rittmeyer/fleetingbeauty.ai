@@ -14,7 +14,7 @@ firebase_admin.initialize_app(cred, {
     'storageBucket': 'fleeting-beauty.appspot.com'
 })
 
-openai.api_key = "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"
+openai.api_key = "APIKEY"
 
 
 def artwork_create(style, subject, colors, tone):
