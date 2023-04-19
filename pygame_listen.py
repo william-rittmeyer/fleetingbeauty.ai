@@ -20,10 +20,22 @@ def handle_change(url):
     location = url
     current_time = datetime.datetime.now()
     time_str = current_time.strftime("%H:%M:%S")
-    next_image = load_image_from_url(location)
+    next_image = load_image_from_url(location, resolution)
     print('handle_change: next_image loaded from', location)
 
-def load_image_from_url(location):
+def display_image_from_url(location, resolution):
+    global previous_image, next_image
+
+    if next_image is None:
+        next_image = load_image_from_url(location, resolution)
+        print('display_image_from_url: next_image loaded from', location)
+
+    if next_image is not None:
+        display_image(next_image, resolution)
+
+    next_image = None
+
+def load_image_from_url(location, resolution):
     try:
         response = http.request('GET', str(location))
         image_data = response.data
@@ -36,9 +48,24 @@ def load_image_from_url(location):
         print('load_image_from_url: image loaded from', location)
     except pygame.error as e:
         return None
-    return image.convert()  # Convert the image to a Surface for hardware acceleration
 
-def display_image(image):
+    # Load a higher resolution image
+    if resolution == (1280, 720):
+        image = pygame.transform.scale(image, (2048, 2048))
+    else:
+        image = pygame.transform.scale(image, (4096, 4096))
+
+    # Scale the image down to fit the screen size with anti-aliasing
+    screen_width, screen_height = pygame.display.get_surface().get_size()
+    if resolution == (1280, 720):
+        image = pygame.transform.smoothscale(image, (int(screen_width/2), int(screen_height/2)))
+    else:
+        image = pygame.transform.smoothscale(image, (screen_width, screen_height))
+
+    return image.convert()
+
+
+def display_image(image, resolution):
     global previous_image
     screen_width, screen_height = pygame.display.get_surface().get_size()
     image = pygame.transform.scale(image, (screen_width, screen_height)) # resize the image to the screen size
@@ -61,18 +88,6 @@ def display_image(image):
     previous_image = image.copy()
 
 
-def display_image_from_url(location):
-    global previous_image, next_image
-
-    if next_image is None:
-        next_image = load_image_from_url(location)
-        print('display_image_from_url: next_image loaded from', location)
-
-    if next_image is not None:
-        display_image(next_image)
-
-    next_image = None
-
 def display_error():
     print('error')
 
@@ -93,21 +108,23 @@ for res in sorted(resolutions.values(), reverse=True):
     try:
         screen = pygame.display.set_mode(res)
         print(f"Display resolution set to {res[0]}x{res[1]}")
+        resolution = res
         break
     except pygame.error:
         continue
 
 # If none of the available resolutions work, set the resolution to (100, 100)
-else:
-    screen = pygame.display.set_mode((100, 100))
-    print("Display resolution set to 100x100")
+    else:
+        screen = pygame.display.set_mode((100, 100))
+        print("Display resolution set to 100x100")
+        resolution = (100, 100)
 
 pygame.display.set_caption("Hello World")  # Optional caption for the window
 info = pygame.display.Info()
 pygame.mouse.set_visible(False)
 
 location = requests.get(url_endpoint).json()
-display_image_from_url(location)
+display_image_from_url(location, resolution)
 
 while True:
     for event in pygame.event.get():
@@ -121,6 +138,6 @@ while True:
     new_location = requests.get(url_endpoint).json()
     if new_location != location:
         handle_change(new_location)
-        display_image_from_url(new_location)
+        display_image_from_url(new_location, resolution)
 
     time.sleep(0.1)
