@@ -36,7 +36,7 @@ def load_image_from_url(location):
         print('load_image_from_url: image loaded from', location)
     except pygame.error as e:
         return None
-    return image
+    return image.convert()  # Convert the image to a Surface for hardware acceleration
 
 def display_image(image):
     global previous_image
@@ -45,7 +45,7 @@ def display_image(image):
 
     alpha = 0
     max_alpha = 255
-    fade_speed = 10
+    fade_speed = 5
 
     while alpha < max_alpha:
         alpha += fade_speed
@@ -78,10 +78,11 @@ def display_error():
 
 
 pygame.init()
-screen = pygame.display.set_mode((1920, 1080))  # Initialize a display surface
+screen = pygame.display.set_mode((1280, 720))  # Initialize a display surface
 pygame.display.set_caption("Hello World")  # Optional caption for the window
 info = pygame.display.Info()
 screen = pygame.display.set_mode((info.current_w, info.current_h)) # Set the display mode to match the screen resolution
+print("Display resolution is:", info.current_w, "x", info.current_h)
 pygame.mouse.set_visible(False)
 
 location = requests.get(url_endpoint).json()
@@ -102,4 +103,3 @@ while True:
         display_image_from_url(new_location)
 
     time.sleep(0.1)
-
