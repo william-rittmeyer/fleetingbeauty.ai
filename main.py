@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # Define the path to the wifi.txt file
-txt_file_path = '/boot/python/wifi.txt'
+txt_file_path = '/boot/wifi.txt'
 
 # Define the path to the wpa_supplicant.conf file
 conf_file_path = '/etc/wpa_supplicant/wpa_supplicant.conf'
