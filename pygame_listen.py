@@ -90,50 +90,17 @@ def display_error():
     global previous_image, next_image
     
     screen_width, screen_height = pygame.display.get_surface().get_size()
-    
-    font = pygame.font.SysFont(None, 50)
-    line1 = font.render("Fleeting Beauty was disconnected from wifi! ", True, (255, 0, 0))
-    line2 = font.render("Please troubleshoot with one of the few:", True, (0, 0, 0))
-    line3 = font.render("    1. Unplug and plug device back in display. ", True, (0, 0, 0))
-    line4 = font.render("    2. Check that your router is connected to the internet.", True, (0, 0, 0))
-    line5 = font.render("    3. Plug in device to computer and re-type in password.", True, (0, 0, 0))
 
-    # Calculate total height of text box
-    total_height = line1.get_height() + line2.get_height() + line3.get_height() + line4.get_height() + line5.get_height()
-    total_height += 60 # Add some padding
+    try:
+        image = pygame.image.load("/boot/python/error.png")
+    except:
+        # If the error image fails to load, display a solid red screen
+        image = pygame.Surface((screen_width, screen_height))
+        image.fill((255, 0, 0))
 
-    box_width = screen_width // 2
-    box_height = total_height // 5
-    margin_left = (screen_width - box_width) // 2
-    margin_top = (screen_height - total_height) // 2
-
-    screen = pygame.display.get_surface()
-    screen.fill((255, 255, 255))
-    pygame.draw.rect(screen, (255, 255, 255), (margin_left, margin_top, box_width, total_height))
-
-    # Calculate y-coordinate of each line
-    line1_y = margin_top + 20
-    line2_y = line1_y + line1.get_height() + 10
-    line3_y = line2_y + line2.get_height() + 10
-    line4_y = line3_y + line3.get_height() + 10
-    line5_y = line4_y + line4.get_height() + 10
-
-    text_rect = line1.get_rect(topleft=(margin_left + 10, line1_y))
-    screen.blit(line1, text_rect)
-
-    text_rect = line2.get_rect(topleft=(margin_left + 10, line2_y))
-    screen.blit(line2, text_rect)
-
-    text_rect = line3.get_rect(topleft=(margin_left + 10, line3_y))
-    screen.blit(line3, text_rect)
-
-    text_rect = line4.get_rect(topleft=(margin_left + 10, line4_y))
-    screen.blit(line4, text_rect)
-
-    text_rect = line5.get_rect(topleft=(margin_left + 10, line5_y))
-    screen.blit(line5, text_rect)
-
-    pygame.display.flip()
+    image = pygame.transform.scale(image, (screen_width, screen_height))
+    pygame.display.get_surface().blit(image, (0, 0))
+    pygame.display.flip() 
 
 
 pygame.init()
@@ -179,10 +146,14 @@ while True:
             if event.key == pygame.K_x:
                 display_error()
 
-    new_location = requests.get(url_endpoint).json()
+    try:
+        new_location = requests.get(url_endpoint).json()
+    except requests.exceptions.ConnectionError:
+        display_error()
+        continue
+
     if new_location != location:
         handle_change(new_location)
         display_image_from_url(new_location, resolution)
 
     time.sleep(0.1)
-
