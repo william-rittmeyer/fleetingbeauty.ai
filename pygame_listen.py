@@ -134,8 +134,12 @@ pygame.display.set_caption("Hello World")  # Optional caption for the window
 info = pygame.display.Info()
 pygame.mouse.set_visible(False)
 
-location = requests.get(url_endpoint).json()
-display_image_from_url(location, resolution)
+try:
+    location = requests.get(url_endpoint).json()
+    display_image_from_url(location, resolution)
+except requests.exceptions.ConnectionError:
+    display_error()
+
 
 while True:
     for event in pygame.event.get():
