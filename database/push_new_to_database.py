@@ -18,12 +18,12 @@ def add_to_list_elements(lst):
     return new_lst
 
 
-directories = [#list of model Numbers goes here]
+directories = [#MODEL NUMBERS]
 
 paths = add_to_list_elements(directories)
 
 # Loop through the list and update each directory with new data
 for x in paths:
-    ref.child(x).update({'painting_name': 'value1', 'url': 'value2'})
+    ref.child(x).update({'painting_name': 'undefined', 'url': 'undefined', 'custom': False, 'color': 'undefined', 'subject': 'undefined', 'tone': 'undefined', 'style': 'undefined', 'ip_addr': 'undefined'})
 
 print('data has been added')
