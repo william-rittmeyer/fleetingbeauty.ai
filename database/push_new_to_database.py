@@ -13,7 +13,7 @@ ref = db.reference()
 def add_to_list_elements(lst):
     new_lst = []
     for elem in lst:
-        new_elem = "version_1/model_number/" + str(elem)
+        new_elem = "version_2/model_number/" + str(elem)
         new_lst.append(new_elem)
     return new_lst
 
