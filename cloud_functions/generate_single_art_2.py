@@ -117,6 +117,10 @@ while True:
       print('picture updated')
       break
 
+    except openai.error.InvalidRequestError:
+      print("Request rejected by OpenAI safety system. Retrying...")
+      continue
+
     except ValueError:
       print("error, trying again")
-
+      continue
