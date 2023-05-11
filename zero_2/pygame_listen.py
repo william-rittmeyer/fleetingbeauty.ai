@@ -5,14 +5,29 @@ import pygame
 import requests
 from io import BytesIO
 from threading import Thread
+import http.client as httplib
+import socket
 
 database_url = 'https://fleeting-beauty-default-rtdb.firebaseio.com/'
 url_endpoint = database_url + 'url.json'
-
+MAX_TIME_WIFI = 10
 previous_image = None
 next_image = None
 
 http = urllib3.PoolManager()
+
+def isConnected():
+    try:
+        # connect to the host -- tells us if the host is actually
+        # reachable
+        sock = socket.create_connection(("www.google.com", 80))
+        if sock is not None:
+            #print('Clossing socket')
+            sock.close
+        return True
+    except OSError:
+        pass
+    return False
 
 def handle_change(url):
     global previous_image, next_image
@@ -21,14 +36,14 @@ def handle_change(url):
     current_time = datetime.datetime.now()
     time_str = current_time.strftime("%H:%M:%S")
     next_image = load_image_from_url(location, resolution)
-    print('handle_change: next_image loaded from', location)
+    #print('handle_change: next_image loaded from', location)
 
 def display_image_from_url(location, resolution):
     global previous_image, next_image
 
     if next_image is None:
         next_image = load_image_from_url(location, resolution)
-        print('display_image_from_url: next_image loaded from', location)
+       # print('display_image_from_url: next_image loaded from', location)
 
     if next_image is not None:
         display_image(next_image, resolution)
@@ -45,7 +60,7 @@ def load_image_from_url(location, resolution):
     try:
         image_file = BytesIO(image_data)
         image = pygame.image.load(image_file)
-        print('load_image_from_url: image loaded from', location)
+        #print('load_image_from_url: image loaded from', location)
     except pygame.error as e:
         return None
 
@@ -86,13 +101,16 @@ def display_image(image, resolution):
     previous_image = image.copy()
 
 
-def display_error():
+def display_error(isWifiWait = False):
     global previous_image, next_image
     
     screen_width, screen_height = pygame.display.get_surface().get_size()
 
     try:
-        image = pygame.image.load("/boot/python/error.png")
+        if isWifiWait:
+            image = pygame.image.load("/boot/python/waitWifi.png")
+        else:
+            image = pygame.image.load("/boot/python/error.png")
     except:
         # If the error image fails to load, display a solid red screen
         image = pygame.Surface((screen_width, screen_height))
@@ -107,7 +125,7 @@ pygame.init()
 
 # Set the possible display resolutions in a dictionary
 resolutions = {
-    '8K': (7680, 4320),
+    '8K': (100, 100),
     '4K': (3840, 2160),
     '1440p': (2560, 1440),
     '1080p': (1920, 1080),
@@ -118,7 +136,7 @@ resolutions = {
 for res in sorted(resolutions.values(), reverse=True):
     try:
         screen = pygame.display.set_mode(res)
-        print(f"Display resolution set to {res[0]}x{res[1]}")
+        #print(f"Display resolution set to {res[0]}x{res[1]}")
         resolution = res
         break
     except pygame.error:
@@ -127,15 +145,26 @@ for res in sorted(resolutions.values(), reverse=True):
 # If none of the available resolutions work, set the resolution to (100, 100)
     else:
         screen = pygame.display.set_mode((100, 100))
-        print("Display resolution set to 100x100")
+        #print("Display resolution set to 100x100")
         resolution = (100, 100)
 
-pygame.display.set_caption("Hello World")  # Optional caption for the window
-info = pygame.display.Info()
+#pygame.display.set_caption("Hello World")  # Optional caption for the window
+#info = pygame.display.Info()
 pygame.mouse.set_visible(False)
+location = None
 
+lastTime = time.time()
+display_error(True)
+#print("Wait internet")
+while not isConnected():
+    #time.sleep(0.1)
+    if time.time() - lastTime >= MAX_TIME_WIFI:
+        break	
+#print("Internet done")
 try:
+   # print("Get request")
     location = requests.get(url_endpoint).json()
+  # print("Display")
     display_image_from_url(location, resolution)
 except requests.exceptions.ConnectionError:
     display_error()
