@@ -14,7 +14,7 @@ firebase_admin.initialize_app(cred, {
     'storageBucket': 'fleeting-beauty.appspot.com'
 })
 
-openai.api_key = "APIKEY"
+openai.api_key = "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"
 
 
 def artwork_create(style, subject, colors, tone):
@@ -22,7 +22,7 @@ def artwork_create(style, subject, colors, tone):
   output_titles = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate 9 titles of landscape painting ideas'
+              'generate 9 titles of impressionist landscape painting ideas'
   }]
   )
 
@@ -43,7 +43,7 @@ def artwork_create(style, subject, colors, tone):
   output_description = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate a landscape painting idea from the following title, ' + title + '. Make the description 3 sentences long. Start the description with the words, A landscape painting'
+              'generate an impressionist landscape painting idea from the following title, ' + title + '. Make the description 3 sentences long. Start the description with the words, An impressionist landscape painting'
   }]
   )
 
@@ -78,15 +78,8 @@ while True:
   if now.second == 0:
   # run the function
     try:
+
       A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
-
-      ref = db.reference('')
-      ref2 = db.reference('version_1/landscape')
-      ref.update({'url': A[0]})
-      ref.update({'painting_name': A[1]})
-
-      ref2.update({'url': A[0]})
-      ref2.update({'painting_name': A[1]})
 
       # Define the URL of the image you want to download and upload
 
@@ -114,6 +107,19 @@ while True:
         print(f"Failed to download image from {image_url}")
 
 
+
+
+      ref = db.reference('')
+      ref2 = db.reference('version_1/landscape')
+      ref.update({'url': A[0]})
+      ref.update({'painting_name': A[1]})
+
+      ref2.update({'url': A[0]})
+      ref2.update({'painting_name': A[1]})
+
+
+
+
       print('picture updated')
       break
 
@@ -124,3 +130,4 @@ while True:
     except ValueError:
       print("error, trying again")
       continue
+
