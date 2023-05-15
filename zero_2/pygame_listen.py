@@ -13,6 +13,7 @@ url_endpoint = database_url + 'url.json'
 MAX_TIME_WIFI = 10
 previous_image = None
 next_image = None
+location = None
 
 http = urllib3.PoolManager()
 
@@ -30,17 +31,20 @@ def isConnected():
     return False
 
 def handle_change(url):
-    global previous_image, next_image
+    global previous_image, next_image, location
     painting_name = http.request('GET', database_url + 'painting_name.json').data.decode('utf-8')
     location = url
     current_time = datetime.datetime.now()
     time_str = current_time.strftime("%H:%M:%S")
-    next_image = load_image_from_url(location, resolution)
-    #print('handle_change: next_image loaded from', location)
+    new_image = load_image_from_url(location, resolution)
+    if new_image is not None:
+        previous_image = pygame.display.get_surface().copy()
+        display_image(new_image, resolution)
 
 def display_image_from_url(location, resolution):
     global previous_image, next_image
-
+    if location != location:
+        handle_change(location)
     if next_image is None:
         next_image = load_image_from_url(location, resolution)
        # print('display_image_from_url: next_image loaded from', location)
@@ -179,14 +183,26 @@ while True:
             if event.key == pygame.K_x:
                 display_error()
 
-    try:
-        new_location = requests.get(url_endpoint).json()
-    except requests.exceptions.ConnectionError:
-        display_error()
-        continue
+    success = False
+
+    for _ in range(2):  # try to get new location twice
+        try:
+            new_location = requests.get(url_endpoint).json()
+            success = True
+            break
+        except requests.exceptions.ConnectionError:
+            time.sleep(5)
+            continue
+
+    if not success:  # if failed to get new location, try to reestablish connection
+        try:
+            new_location = requests.get(url_endpoint).json()
+        except requests.exceptions.ConnectionError:
+            display_error()
+            continue
 
     if new_location != location:
         handle_change(new_location)
         display_image_from_url(new_location, resolution)
 
-    time.sleep(0.1)
+    time.sleep(5)
