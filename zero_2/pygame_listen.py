@@ -6,6 +6,7 @@ import requests
 from io import BytesIO
 from threading import Thread
 import http.client as httplib
+import subprocess
 import socket
 
 database_url = 'https://fleeting-beauty-default-rtdb.firebaseio.com/'
@@ -196,6 +197,8 @@ while True:
 
     if not success:  # if failed to get new location, try to reestablish connection
         try:
+            subprocess.run(['sudo', 'wpa_cli', '-i', 'wlan0', 'reconfigure'])
+            time.sleep(5)
             new_location = requests.get(url_endpoint).json()
         except requests.exceptions.ConnectionError:
             display_error()
