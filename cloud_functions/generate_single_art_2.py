@@ -4,6 +4,7 @@ import random
 import datetime
 import requests
 import firebase_admin
+import time
 from firebase_admin import credentials
 from firebase_admin import storage
 from firebase_admin import db
@@ -14,7 +15,7 @@ firebase_admin.initialize_app(cred, {
     'storageBucket': 'fleeting-beauty.appspot.com'
 })
 
-openai.api_key = "APIKEY"
+openai.api_key = "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"
 
 
 def artwork_create(style, subject, colors, tone):
@@ -125,6 +126,11 @@ while True:
 
     except openai.error.InvalidRequestError:
       print("Request rejected by OpenAI safety system. Retrying...")
+      continue
+
+    except openai.error.RateLimitError:
+      print("Rate limit exceeded. Waiting and retrying...")
+      time.sleep(60)  # Wait for 60 seconds before retrying
       continue
 
     except ValueError:
