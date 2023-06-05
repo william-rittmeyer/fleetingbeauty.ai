@@ -1,13 +1,19 @@
+import os
+
+def forceFBI():
+    os.system("sudo fbi -d /dev/fb0 -a -noverbose -T 1 /boot/splash.png")
+#forceFBI()
+
 import datetime
 import time
 import urllib3
-import pygame
 import requests
 from io import BytesIO
 from threading import Thread
 import http.client as httplib
 import subprocess
 import socket
+
 
 database_url = 'https://fleeting-beauty-default-rtdb.firebaseio.com/'
 url_endpoint = database_url + 'url.json'
@@ -17,7 +23,6 @@ next_image = None
 location = None
 
 http = urllib3.PoolManager()
-
 def isConnected():
     try:
         # connect to the host -- tells us if the host is actually
@@ -37,15 +42,18 @@ def handle_change(url):
     location = url
     current_time = datetime.datetime.now()
     time_str = current_time.strftime("%H:%M:%S")
-    new_image = load_image_from_url(location, resolution)
-    if new_image is not None:
-        previous_image = pygame.display.get_surface().copy()
-        display_image(new_image, resolution)
+    next_image = load_image_from_url(location, resolution)
+    if next_image is not None:
+         previous_image = pygame.display.get_surface().copy()
+         display_image(next_image, resolution)
+
+    #print('handle_change: next_image loaded from', location)
 
 def display_image_from_url(location, resolution):
     global previous_image, next_image
     if location != location:
-        handle_change(location)
+         handle_change(location)
+
     if next_image is None:
         next_image = load_image_from_url(location, resolution)
        # print('display_image_from_url: next_image loaded from', location)
@@ -105,30 +113,33 @@ def display_image(image, resolution):
 
     previous_image = image.copy()
 
-
 def display_error(isWifiWait = False):
     global previous_image, next_image
-    
     screen_width, screen_height = pygame.display.get_surface().get_size()
 
     try:
         if isWifiWait:
-            image = pygame.image.load("/boot/python/waitWifi.png")
+            image = pygame.image.load("/boot/splash.png")
         else:
             image = pygame.image.load("/boot/python/error.png")
     except:
         # If the error image fails to load, display a solid red screen
         image = pygame.Surface((screen_width, screen_height))
         image.fill((255, 0, 0))
-
     image = pygame.transform.scale(image, (screen_width, screen_height))
     pygame.display.get_surface().blit(image, (0, 0))
     pygame.display.flip() 
 
+lastTime = time.time()
 
-pygame.init()
+while not isConnected():
+    #time.sleep(0.1)
+    if time.time() - lastTime >= MAX_TIME_WIFI:
+        break   
 
+import pygame
 # Set the possible display resolutions in a dictionary
+forceFBI()
 resolutions = {
     '8K': (100, 100),
     '4K': (3840, 2160),
@@ -136,11 +147,10 @@ resolutions = {
     '1080p': (1920, 1080),
     '720p': (1280, 720)
 }
-
 # Try setting the display to the highest available resolution first
 for res in sorted(resolutions.values(), reverse=True):
     try:
-        screen = pygame.display.set_mode(res)
+        screen = pygame.display.set_mode((0,0)) #res)
         #print(f"Display resolution set to {res[0]}x{res[1]}")
         resolution = res
         break
@@ -149,31 +159,21 @@ for res in sorted(resolutions.values(), reverse=True):
 
 # If none of the available resolutions work, set the resolution to (100, 100)
     else:
-        screen = pygame.display.set_mode((100, 100))
+        screen = pygame.display.set_mode((0,0))
         #print("Display resolution set to 100x100")
         resolution = (100, 100)
 
-#pygame.display.set_caption("Hello World")  # Optional caption for the window
-#info = pygame.display.Info()
+pygame.init()
 pygame.mouse.set_visible(False)
 location = None
-
-lastTime = time.time()
 display_error(True)
-#print("Wait internet")
-while not isConnected():
-    #time.sleep(0.1)
-    if time.time() - lastTime >= MAX_TIME_WIFI:
-        break	
-#print("Internet done")
+lastTime = time.time()
+
 try:
-   # print("Get request")
     location = requests.get(url_endpoint).json()
-  # print("Display")
     display_image_from_url(location, resolution)
 except requests.exceptions.ConnectionError:
     display_error()
-
 
 while True:
     for event in pygame.event.get():
