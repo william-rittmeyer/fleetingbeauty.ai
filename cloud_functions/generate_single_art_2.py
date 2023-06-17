@@ -15,24 +15,23 @@ firebase_admin.initialize_app(cred, {
     'storageBucket': 'fleeting-beauty.appspot.com'
 })
 
-openai.api_key = "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"
+openai.api_key = "API-KEY"
 
-
-def artwork_create(style, subject, colors, tone):
+def artwork_create():
 
   output_titles = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate 9 titles of impressionist landscape painting ideas'
+              'generate 9 titles of impressionist painting ideas about beautiful places'
   }]
   )
 
   painting_titles =  output_titles['choices'][0]['message']['content']
 
   painting_titles = painting_titles.split('\n')
-  
+
   num = random.randint(1, 8)
-  
+
   title = painting_titles[num]
   title = title[3:]
 
@@ -44,12 +43,12 @@ def artwork_create(style, subject, colors, tone):
   output_description = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate an impressionist landscape painting idea from the following title, ' + title + '. Make the description 3 sentences long. Start the description with the words, An impressionist landscape painting'
+              'generate a impressionist painting about beautiful places, ' + title + '. Make the description 4 sentences long. Start the description with the words, An impressionist painting'
   }]
   )
 
   painting_description =  output_description['choices'][0]['message']['content']
-  
+
   print(painting_description)
 
 
@@ -80,7 +79,7 @@ while True:
   # run the function
     try:
 
-      A = artwork_create('abstarct','galaxy', 'blue', 'chaotic')
+      A = artwork_create()
 
       # Define the URL of the image you want to download and upload
 
@@ -95,7 +94,7 @@ while True:
       folder_path = "prototype/"
 
       # Download the image from the URL
-      response = requests.get(image_url)
+      response = requests.get(image_url, timeout=600)
       if response.status_code == 200:
         # Upload the image to Firebase storage
         bucket = storage.bucket()
@@ -133,7 +132,20 @@ while True:
       time.sleep(60)  # Wait for 60 seconds before retrying
       continue
 
+    except openai.error.APIError:
+      print("A network issue has occurred. Retrying...")
+      time.sleep(60)  # Wait for 60 seconds before retrying
+      continue
+
+    except requests.exceptions.RequestException:
+      print("HTTP request to download image failed. Retrying...")
+      continue
+
+    except openai.error.Timeout:
+      print("OpenAI API request timed out. Waiting and retrying...")
+      time.sleep(60)  # Wait for 60 seconds before retrying
+      continue
+
     except ValueError:
       print("error, trying again")
       continue
-
