@@ -13,10 +13,13 @@ from threading import Thread
 import http.client as httplib
 import subprocess
 import socket
+import pygame
 
 
 database_url = 'https://fleeting-beauty-default-rtdb.firebaseio.com/'
 url_endpoint = database_url + 'url.json'
+url_endpoint_premium = database_url + 'url2.json'
+premium_boolean_endpoint = database_url + 'test.json'
 MAX_TIME_WIFI = 10
 previous_image = None
 next_image = None
@@ -136,8 +139,6 @@ while not isConnected():
     #time.sleep(0.1)
     if time.time() - lastTime >= MAX_TIME_WIFI:
         break   
-
-import pygame
 # Set the possible display resolutions in a dictionary
 forceFBI()
 resolutions = {
@@ -170,7 +171,12 @@ display_error(True)
 lastTime = time.time()
 
 try:
-    location = requests.get(url_endpoint).json()
+    premium_boolean = requests.get(premium_boolean_endpoint).json()
+    if (premium_boolean):
+        location = requests.get(url_endpoint_premium).json()
+    else:
+        location = requests.get(url_endpoint).json()
+
     display_image_from_url(location, resolution)
 except requests.exceptions.ConnectionError:
     display_error()
@@ -188,7 +194,11 @@ while True:
 
     for _ in range(2):  # try to get new location twice
         try:
-            new_location = requests.get(url_endpoint).json()
+            premium_boolean = requests.get(premium_boolean_endpoint).json()
+            if (premium_boolean):
+                new_location = requests.get(url_endpoint_premium).json()
+            else:
+                new_location = requests.get(url_endpoint).json()
             success = True
             break
         except requests.exceptions.ConnectionError:
