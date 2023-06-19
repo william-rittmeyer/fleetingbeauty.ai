@@ -209,7 +209,11 @@ while True:
         try:
             subprocess.run(['sudo', 'wpa_cli', '-i', 'wlan0', 'reconfigure'])
             time.sleep(5)
-            new_location = requests.get(url_endpoint).json()
+            premium_boolean = requests.get(premium_boolean_endpoint).json()
+            if (premium_boolean):
+                new_location = requests.get(url_endpoint_premium).json()
+            else:
+                new_location = requests.get(url_endpoint).json()
         except requests.exceptions.ConnectionError:
             display_error()
             continue
