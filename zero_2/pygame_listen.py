@@ -17,9 +17,13 @@ import pygame
 
 
 database_url = 'https://fleeting-beauty-default-rtdb.firebaseio.com/'
-url_endpoint = database_url + 'url.json'
-url_endpoint_premium = database_url + 'url2.json'
-premium_boolean_endpoint = database_url + 'test.json'
+url_landscape_endpoint = database_url + 'url_landscape.json'
+url_endpoint_premium = database_url + 'url_premium.json'
+premium_boolean_endpoint = database_url + 'premium.json'
+painting_index_endpoint = database_url + 'painting_index.json'
+url_abstract_endpoint = database_url + 'url_abstract.json'
+url_cubism_endpoint = database_url + 'url_cubism.json'
+
 MAX_TIME_WIFI = 10
 previous_image = None
 next_image = None
@@ -41,7 +45,7 @@ def isConnected():
 
 def handle_change(url):
     global previous_image, next_image, location
-    painting_name = http.request('GET', database_url + 'painting_name.json').data.decode('utf-8')
+    painting_name = http.request('GET', database_url + 'painting_name_landscape.json').data.decode('utf-8')
     location = url
     current_time = datetime.datetime.now()
     time_str = current_time.strftime("%H:%M:%S")
@@ -131,14 +135,14 @@ def display_error(isWifiWait = False):
         image.fill((255, 0, 0))
     image = pygame.transform.scale(image, (screen_width, screen_height))
     pygame.display.get_surface().blit(image, (0, 0))
-    pygame.display.flip() 
+    pygame.display.flip()
 
 lastTime = time.time()
 
 while not isConnected():
     #time.sleep(0.1)
     if time.time() - lastTime >= MAX_TIME_WIFI:
-        break   
+        break
 # Set the possible display resolutions in a dictionary
 forceFBI()
 resolutions = {
@@ -172,33 +176,36 @@ lastTime = time.time()
 
 try:
     premium_boolean = requests.get(premium_boolean_endpoint).json()
+    painting_index = requests.get(painting_index_endpoint).json()
     if (premium_boolean):
-        location = requests.get(url_endpoint_premium).json()
+        new_location = requests.get(url_endpoint_premium).json()
+    elif (painting_index == 1):
+        new_location = requests.get(url_landscape_endpoint).json()
+    elif (painting_index == 2):
+        new_location = requests.get(url_abstract_endpoint).json()
     else:
-        location = requests.get(url_endpoint).json()
+        new_location = requests.get(url_cubism_endpoint).json()
+
 
     display_image_from_url(location, resolution)
 except requests.exceptions.ConnectionError:
     display_error()
 
 while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_x:
-                display_error()
-
     success = False
 
     for _ in range(2):  # try to get new location twice
         try:
             premium_boolean = requests.get(premium_boolean_endpoint).json()
+            painting_index = requests.get(painting_index_endpoint).json()
             if (premium_boolean):
                 new_location = requests.get(url_endpoint_premium).json()
+            elif (painting_index == 1):
+                new_location = requests.get(url_landscape_endpoint).json()
+            elif (painting_index == 2):
+                new_location = requests.get(url_abstract_endpoint).json()
             else:
-                new_location = requests.get(url_endpoint).json()
+                new_location = requests.get(url_cubism_endpoint).json()
             success = True
             break
         except requests.exceptions.ConnectionError:
@@ -210,10 +217,15 @@ while True:
             subprocess.run(['sudo', 'wpa_cli', '-i', 'wlan0', 'reconfigure'])
             time.sleep(5)
             premium_boolean = requests.get(premium_boolean_endpoint).json()
+            painting_index = requests.get(painting_index_endpoint).json()
             if (premium_boolean):
                 new_location = requests.get(url_endpoint_premium).json()
+            elif (painting_index == 1):
+                new_location = requests.get(url_landscape_endpoint).json()
+            elif (painting_index == 2):
+                new_location = requests.get(url_abstract_endpoint).json()
             else:
-                new_location = requests.get(url_endpoint).json()
+                new_location = requests.get(url_cubism_endpoint).json()
         except requests.exceptions.ConnectionError:
             display_error()
             continue
