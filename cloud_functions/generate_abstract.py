@@ -15,9 +15,7 @@ firebase_admin.initialize_app(cred, {
     'storageBucket': 'fleeting-beauty.appspot.com'
 })
 
-openai.api_key = "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"
-
-#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
+openai.api_key = "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"
 
 
 def artwork_create():
@@ -25,7 +23,7 @@ def artwork_create():
   output_titles = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate 9 titles of impressionist painting ideas about beautiful places'
+              'generate 9 titles of abstract painting ideas'
   }]
   )
 
@@ -48,7 +46,7 @@ def artwork_create():
   output_description = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate a impressionist painting about beautiful places, ' + title + '. Make the description 4 sentences long. Start the description with the words, An impressionist painting'
+              'generate an abstract painting about beautiful places, ' + title + '. Make the description 4 sentences long. Start the description with the words, An abstract painting'
   }]
   )
 
@@ -96,7 +94,7 @@ while True:
 
 
       filename = datetime_string + A[1].lower().replace(" ","_")
-      folder_path = "prototype/"
+      folder_path = "abstract/"
 
       # Download the image from the URL
       response = requests.get(image_url, timeout=600)
@@ -118,17 +116,19 @@ while True:
       url_google = blob.generate_signed_url(datetime.timedelta(hours=1), method='GET')
 
 
-
       ref = db.reference('')
-      ref2 = db.reference('version_1/landscape')
-      ref.update({'url': url_google})
-      ref.update({'painting_name': A[1]})
+      ref.update({'url_abstract': url_google})
+      ref.update({'painting_name_abstract': A[1]})
 
-      ref2.update({'url': A[0]})
-      ref2.update({'painting_name': A[1]})
 
+      # Generate download token
+      download_token = blob.generate_signed_url(datetime.timedelta(seconds=6000), method='GET')
 
       print("************************************************************************************************************************************************************")
+
+      # Print the URL of the uploaded image
+      print(f"{download_token}")
+
 
 
 
