@@ -17,6 +17,7 @@ firebase_admin.initialize_app(cred, {
 
 openai.api_key = "APIKEY"
 
+
 def artwork_create():
 
   output_titles = openai.ChatCompletion.create(
@@ -117,12 +118,8 @@ while True:
 
 
       ref = db.reference('')
-      ref2 = db.reference('version_1/landscape')
-      ref.update({'url': url_google})
-      ref.update({'painting_name': A[1]})
-
-      ref2.update({'url': A[0]})
-      ref2.update({'painting_name': A[1]})
+      ref.update({'url_landscape': url_google})
+      ref.update({'painting_name_landscape': A[1]})
 
 
       print("************************************************************************************************************************************************************")
