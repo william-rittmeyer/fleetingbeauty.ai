@@ -1,4 +1,5 @@
 import openai
+import subprocess
 import json
 import random
 import datetime
@@ -18,13 +19,12 @@ firebase_admin.initialize_app(cred, {
 openai.api_key = "APIKEY"
 
 
-
 def artwork_create():
 
   output_titles = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate 9 titles of impressionist painting ideas about beautiful places'
+              'generate 9 titles of abstract painting ideas'
   }]
   )
 
@@ -47,7 +47,7 @@ def artwork_create():
   output_description = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
     messages=[{"role": "user", "content":
-              'generate a impressionist painting about beautiful places, ' + title + '. Make the description 4 sentences long. Start the description with the words, An impressionist painting'
+              'generate an abstract painting about beautiful places, ' + title + '. Make the description 4 sentences long. Start the description with the words, An abstract painting'
   }]
   )
 
@@ -95,7 +95,7 @@ while True:
 
 
       filename = datetime_string + A[1].lower().replace(" ","_")
-      folder_path = "prototype/"
+      folder_path = "abstract/"
 
       # Download the image from the URL
       response = requests.get(image_url, timeout=600)
@@ -117,12 +117,9 @@ while True:
 
 
       ref = db.reference('')
-      ref2 = db.reference('version_1/landscape')
-      ref.update({'url': A[0]})
-      ref.update({'painting_name': A[1]})
+      ref.update({'url_abstract': A[0]})
+      ref.update({'painting_name_abstract': A[1]})
 
-      ref2.update({'url': A[0]})
-      ref2.update({'painting_name': A[1]})
 
       # Generate download token
       download_token = blob.generate_signed_url(datetime.timedelta(seconds=6000), method='GET')
