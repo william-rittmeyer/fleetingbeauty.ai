@@ -23,6 +23,8 @@ premium_boolean_endpoint = database_url + 'premium.json'
 painting_index_endpoint = database_url + 'painting_index.json'
 url_abstract_endpoint = database_url + 'url_abstract.json'
 url_cubism_endpoint = database_url + 'url_cubism.json'
+url_animals_endpoint = database_url + 'url_animals.json'
+
 
 MAX_TIME_WIFI = 10
 previous_image = None
@@ -183,8 +185,10 @@ try:
         new_location = requests.get(url_landscape_endpoint).json()
     elif (painting_index == 2):
         new_location = requests.get(url_abstract_endpoint).json()
-    else:
+    elif (painting_index == 3):
         new_location = requests.get(url_cubism_endpoint).json()
+    else:
+        new_location = requests.get(url_animals_endpoint).json()
 
 
     display_image_from_url(location, resolution)
@@ -204,8 +208,10 @@ while True:
                 new_location = requests.get(url_landscape_endpoint).json()
             elif (painting_index == 2):
                 new_location = requests.get(url_abstract_endpoint).json()
-            else:
+            elif (painting_index == 3):
                 new_location = requests.get(url_cubism_endpoint).json()
+            else:
+                new_location = requests.get(url_animals_endpoint).json()
             success = True
             break
         except requests.exceptions.ConnectionError:
@@ -224,8 +230,10 @@ while True:
                 new_location = requests.get(url_landscape_endpoint).json()
             elif (painting_index == 2):
                 new_location = requests.get(url_abstract_endpoint).json()
-            else:
+            elif (painting_index == 3):
                 new_location = requests.get(url_cubism_endpoint).json()
+            else:
+                new_location = requests.get(url_animals_endpoint).json()
         except requests.exceptions.ConnectionError:
             display_error()
             continue
